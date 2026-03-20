@@ -1,7 +1,7 @@
 # SSL Admin 2026 - Task Documentation
 **Author:** Arvind K N
 
-##Task 1: Initial Setup
+## Task 1: Initial Setup
 
 ### Context
 To begin the induction tasks, I provisioned an Ubuntu 22.04 LTS Virtual Machine (VM) hosted on Microsoft Azure. The VM was assigned a public IP address (`20.219.226.123`), and an RSA private key (`akn4ssl_key.pem`) was generated for secure authentication. 
@@ -24,43 +24,43 @@ SSH requires strict permissions to function. So I locked down the hidden .ssh fo
 chmod 700 ~/.ssh
 chmod 400 ~/.ssh/akn4ssl_key.pem
 ```
---> chmod: "Change mode" - the command to alter file access permissions.
+- chmod: "Change mode" - the command to alter file access permissions.
 
---> 700: Grants the owner full access (4+2+1) and strips all access from everyone else.
+- 700: Grants the owner full access (4+2+1) and strips all access from everyone else.
 
---> 400: Grants the owner read-only access (4) and strips all access from everyone else.
+- 400: Grants the owner read-only access (4) and strips all access from everyone else.
 
---> ~: A shortcut symbol that always points to the current user's home directory.
+- ~: A shortcut symbol that always points to the current user's home directory.
 
---> /.ssh: The hidden directory containing SSH configuration files (the . makes it hidden).
+- /.ssh: The hidden directory containing SSH configuration files (the . makes it hidden).
 
 **Step 3: Connecting to the Azure VM**
 With the key secured, we established the connection to the server.
 ```bash
 ssh -i ~/.ssh/akn4ssl_key.pem akn4ssl@20.219.226.123
 ```
---> ssh: Invokes the Secure Shell client program.
+- ssh: Invokes the Secure Shell client program.
 
---> -i: "Identity" flag, telling SSH we are providing a specific private key file rather than a password.
+- -i: "Identity" flag, telling SSH we are providing a specific private key file rather than a password.
 
---> akn4ssl: The specific username we are trying to log in as on the remote server.
+- akn4ssl: The specific username we are trying to log in as on the remote server.
 
---> @: Separates the username from the destination address.
+- @: Separates the username from the destination address.
 
---> 20.219.226.123: The public IP address of the Azure VM.
+- 20.219.226.123: The public IP address of the Azure VM.
 
 **Step 4:System Updates and Security**
 Once logged into the server, we updated the system packages.
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
---> apt: The package manager for Ubuntu/Debian systems (Advanced Package Tool).
+- apt: The package manager for Ubuntu/Debian systems (Advanced Package Tool).
 
---> update: Downloads the latest list of available software versions from the Ubuntu servers (does not install them).
+- update: Downloads the latest list of available software versions from the Ubuntu servers (does not install them).
 
---> upgrade: Actually downloads and installs the newer versions of the packages.
+- upgrade: Actually downloads and installs the newer versions of the packages.
 
---> -y: "Yes" - automatically answers "yes" to any installation prompts so the process doesn't pause.
+- -y: "Yes" - automatically answers "yes" to any installation prompts so the process doesn't pause.
 
 **Step 5: Automating Security Patches**
 To ensure the system always receives the latest security updates automatically, we configured unattended upgrades.
@@ -68,11 +68,11 @@ To ensure the system always receives the latest security updates automatically, 
 sudo apt install unattended-upgrades -y
 sudo dpkg-reconfigure --priority=low unattended-upgrades
 ```
---> install unattended-upgrades: Downloads the specific software package that manages automatic background updates.
+- install unattended-upgrades: Downloads the specific software package that manages automatic background updates.
 
---> dpkg-reconfigure: A tool used to re-run the initial configuration setup of an installed package.
+- dpkg-reconfigure: A tool used to re-run the initial configuration setup of an installed package.
 
---> --priority=low: Ensures that all configuration questions (even the low-priority ones) are displayed to the user via an interactive menu.
+- --priority=low: Ensures that all configuration questions (even the low-priority ones) are displayed to the user via an interactive menu.
 
 End of task 1
 ## Task 2: Enhanced SSH Security
@@ -84,11 +84,11 @@ Right now to the server we are having two login's one is through the user accoun
 sudo nano /etc/ssh/sshd_config
 ```
 And this would open the sshd_config file and in that we change the following 
---> PermitRootLogin no => This remove root access.
+- PermitRootLogin no => This remove root access.
 
---> PasswordAuthentication no => This permanently disables password guessing.
+- PasswordAuthentication no => This permanently disables password guessing.
 
---> PubkeyAuthentication yes => This enforces that only cryptographic keys are allowed.
+- PubkeyAuthentication yes => This enforces that only cryptographic keys are allowed.
 and the  finally restard the server to apply the changes:
 ```bash
 sudo systemctl restart ssh
@@ -97,12 +97,12 @@ sudo systemctl restart ssh
 ##Concept
 The azure server is having a public IP address, here in this case (`20.219.226.123`) that is the destination IP. Anyone on the internet needs to know this IP to talk to the server but hackers and other users uses tools like nmap ,masscan etc to scan every single ip address hence in that case our server IP would be found and it further adds on to risk hence in this stage we are locking in the server to look into the Source IP and if it is not in the range specified, do not even give a chance to enter the password and such stuffs. So that the next time when someone knocks into the servers door ssh deamon looks through both the user and source IP to access the server.
 
--->Step 1:Open the Config File Again**
+- Step 1:Open the Config File Again**
 ``` bash
     sudo nano /etc/ssh/sshd_config
 ```
     Find the IP range using the following command : "curl ifconfig.me" and thsi returns an ip address in my case it has given 61.1.180.57 so we buil based on 61.1.*.*
--->Step 2:Move through the configuration file**
+- Step 2:Move through the configuration file**
     Move through the configuration file and make : AllowUsers akn4ssl@61.1.*.*
     and then apply "
 ```bash
@@ -114,11 +114,11 @@ We have added security for the server right now any user could try the doing bru
 ```bash 
 sudo apt install fail2ban -y
 ```
---> Step 2: Enable the service to start automatically on system boot
+- Step 2: Enable the service to start automatically on system boot
 ``` bash
 sudo systemctl enable fail2ban
 ```
---> Step 3: Start the monitoring service
+- Step 3: Start the monitoring service
 ```bash
 sudo systemctl start fail2ban
 ```
