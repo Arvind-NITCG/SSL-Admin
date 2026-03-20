@@ -1,10 +1,10 @@
 # SSL Admin 2026 - Task Documentation
 **Author:** Arvind K N
 
-##[cite_start]Task 1: Initial Setup [cite: 14]
+##Task 1: Initial Setup
 
 ### Context
-[cite_start]To begin the induction tasks, I provisioned an Ubuntu 22.04 LTS Virtual Machine (VM) hosted on Microsoft Azure[cite: 15, 18]. The VM was assigned a public IP address (`20.219.226.123`), and an RSA private key (`akn4ssl_key.pem`) was generated for secure authentication. 
+To begin the induction tasks, I provisioned an Ubuntu 22.04 LTS Virtual Machine (VM) hosted on Microsoft Azure. The VM was assigned a public IP address (`20.219.226.123`), and an RSA private key (`akn4ssl_key.pem`) was generated for secure authentication. 
 
 ### Concept Learned
 **SSH (Secure Shell) & Public Key Cryptography:** SSH is a client-server protocol that provides an encrypted terminal session over an unsecured network. Instead of passwords, it uses asymmetric cryptography (like RSA or ED25519). The server holds a "Public Key" (a lock), and the client holds the "Private Key" (the `.pem` file). If the private key file has loose permissions (e.g., readable by other users), the SSH client is hardcoded to block the connection to prevent a security breach.
@@ -85,7 +85,9 @@ sudo nano /etc/ssh/sshd_config
 ```
 And this would open the sshd_config file and in that we change the following 
 --> PermitRootLogin no => This remove root access.
+
 --> PasswordAuthentication no => This permanently disables password guessing.
+
 --> PubkeyAuthentication yes => This enforces that only cryptographic keys are allowed.
 and the  finally restard the server to apply the changes:
 ```bash
@@ -95,19 +97,18 @@ sudo systemctl restart ssh
 ##Concept
 The azure server is having a public IP address, here in this case (`20.219.226.123`) that is the destination IP. Anyone on the internet needs to know this IP to talk to the server but hackers and other users uses tools like nmap ,masscan etc to scan every single ip address hence in that case our server IP would be found and it further adds on to risk hence in this stage we are locking in the server to look into the Source IP and if it is not in the range specified, do not even give a chance to enter the password and such stuffs. So that the next time when someone knocks into the servers door ssh deamon looks through both the user and source IP to access the server.
 
--->step 1:Open the Config File Again**
+-->Step 1:Open the Config File Again**
 ``` bash
     sudo nano /etc/ssh/sshd_config
 ```
-    Find the IP range using the followinf command : "curl ifconfig.me" and thsi returns an ip address in my case it has given 61.1.180.57 so we buil based on 61.1.*.*
--->step 2:Move through the configuration file**
+    Find the IP range using the following command : "curl ifconfig.me" and thsi returns an ip address in my case it has given 61.1.180.57 so we buil based on 61.1.*.*
+-->Step 2:Move through the configuration file**
     Move through the configuration file and make : AllowUsers akn4ssl@61.1.*.*
     and then apply "
 ```bash
     sudo systemctl restart sshd
 ```
 **Set up fail2ban to protect against brute-force attacks.**
-##Concept
 We have added security for the server right now any user could try the doing brute force attack on the server so now we implement fail2ban so that if the same IP tries for multiple attacks automaticaly this tool will act to restrict that IP from accessing the server.Hence acting as a Firewall protection for the vm.
 --> Step 1:Install and enable Fail2ban
 ```bash 
@@ -151,7 +152,3 @@ Modify the file : Allowed interactive prompts: KbdInteractiveAuthentication yes 
 Step 5 : Apply the changes using sudo sysatemctl restart sshd
 
 Hence we have set up Multi-Factor Authentication for our VM, hence making it more secure.
-
-
-
-
