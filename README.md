@@ -432,6 +432,7 @@ sudo apt install nginx -y
 
 sudo nano /etc/nginx/sites-available/default
 and remove everything in it and add these: 
+```bash
 server {
     listen 80;
     server_name bazzlunk.sslnitc.site;
@@ -449,7 +450,8 @@ server {
     location /sslopen {
         proxy_pass http://127.0.0.1:3000;
     }
-} 
+}
+```
 Right now we are listeing at HTTP or port 80 but that is not safe as hackers could encrypt the datas easily. so We need to implement it in port 443 or HTTPS means HTTP Secure; so we need SSL certificates for that as well. Also in the configuration we have added the command for Nginx to act as a shield against XSS attacks and this is called Content Security policy.
 
 - Test whether the configuartion is correct : 
